@@ -1,7 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"bookstore-go/config"
+	"bookstore-go/global"
+)
 
 func main() {
-	fmt.Println("Hello, World!")
+	config.InitConfig("../conf/config.yaml")
+	global.InitMysql()
+	global.InitRedis()
 }
