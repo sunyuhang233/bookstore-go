@@ -43,3 +43,12 @@ func (s *CaptchaService) GenerateCaptcha() (*CaptchaResponse, error) {
 		Image:     b64s,
 	}, nil
 }
+
+func (s *CaptchaService) VerifyCaptcha(captchaID, captcha string) bool {
+	redis_key := fmt.Sprintf("captcha_%s", captchaID)
+	answer, err := global.RedisClient.Get(context.TODO(), redis_key).Result()
+	if err != nil {
+		return false
+	}
+	return captcha == answer
+}

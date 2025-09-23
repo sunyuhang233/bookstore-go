@@ -16,8 +16,10 @@ type RegisterRequest struct {
 }
 
 type LoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	CaptchaID string `json:"captcha_id"`
+	Image     string `json:"image"`
 }
 
 func Register(c *gin.Context) {
@@ -55,4 +57,27 @@ func Login(c *gin.Context) {
 			"error":   err,
 		})
 	}
+	user_service := service.NewUserService()
+	captcha_service := service.NewCaptchaService()
+	if !captcha_service.VerifyCaptcha(req.CaptchaID, req.Image) {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    -1,
+			"message": "验证码错误",
+		})
+		return
+	}
+	res, err := user_service.Login(req.Username, req.Password, req.Image, req.CaptchaID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    -1,
+			"message": "登录失败",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
+		"message": "登录成功",
+		"data":    res,
+	})
 }
