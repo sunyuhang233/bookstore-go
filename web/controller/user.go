@@ -22,7 +22,19 @@ type LoginRequest struct {
 	Image     string `json:"image"`
 }
 
-func Register(c *gin.Context) {
+type UserController struct {
+	UserService    *service.UserService
+	CaptchaService *service.CaptchaService
+}
+
+func NewUserController() *UserController {
+	return &UserController{
+		UserService:    service.NewUserService(),
+		CaptchaService: service.NewCaptchaService(),
+	}
+}
+
+func (u *UserController) Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -31,8 +43,7 @@ func Register(c *gin.Context) {
 			"error":   err,
 		})
 	}
-	service := service.NewUserService()
-	err := service.Register(req.Username, req.Password, req.Email, req.Phone, req.ConfirmPassword)
+	err := u.UserService.Register(req.Username, req.Password, req.Email, req.Phone, req.ConfirmPassword)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    -1,
@@ -48,7 +59,7 @@ func Register(c *gin.Context) {
 
 }
 
-func Login(c *gin.Context) {
+func (u *UserController) Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -57,16 +68,14 @@ func Login(c *gin.Context) {
 			"error":   err,
 		})
 	}
-	user_service := service.NewUserService()
-	captcha_service := service.NewCaptchaService()
-	if !captcha_service.VerifyCaptcha(req.CaptchaID, req.Image) {
+	if !u.CaptchaService.VerifyCaptcha(req.CaptchaID, req.Image) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    -1,
 			"message": "验证码错误",
 		})
 		return
 	}
-	res, err := user_service.Login(req.Username, req.Password, req.Image, req.CaptchaID)
+	res, err := u.UserService.Login(req.Username, req.Password, req.Image, req.CaptchaID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    -1,

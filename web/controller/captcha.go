@@ -6,9 +6,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GenerateCaptcha(c *gin.Context) {
-	service := service.NewCaptchaService()
-	res, err := service.GenerateCaptcha()
+type CaptchaController struct {
+	CaptchaService *service.CaptchaService
+}
+
+func NewCaptchaController() *CaptchaController {
+	return &CaptchaController{
+		CaptchaService: service.NewCaptchaService(),
+	}
+}
+
+func (captcha *CaptchaController) GenerateCaptcha(c *gin.Context) {
+	res, err := captcha.CaptchaService.GenerateCaptcha()
 	if err != nil {
 		c.JSON(500, gin.H{
 			"code":    -1,

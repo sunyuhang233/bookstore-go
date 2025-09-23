@@ -19,13 +19,15 @@ func InitRouter() *gin.Engine {
 	{
 		// 用户相关路由组
 		user := v1.Group("/user")
+		userController := controller.NewUserController()
 		{
-			user.POST("/register", controller.Register)
-			user.POST("/login", controller.Login)
+			user.POST("/register", userController.Register)
+			user.POST("/login", userController.Login)
 		}
 	}
 
 	captcha := v1.Group("/captcha")
+	controller := controller.NewCaptchaController()
 	{
 		captcha.GET("/generate", controller.GenerateCaptcha)
 	}
