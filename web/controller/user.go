@@ -90,3 +90,28 @@ func (u *UserController) Login(c *gin.Context) {
 		"data":    res,
 	})
 }
+
+func (u *UserController) UserInfo(c *gin.Context) {
+	userId, exists := c.Get("admin_user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    -1,
+			"message": "未登录",
+		})
+		return
+	}
+	user, err := u.UserService.GetUserInfo(userId.(int))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    -1,
+			"message": "获取用户信息失败",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
+		"message": "获取用户信息成功",
+		"data":    user,
+	})
+}

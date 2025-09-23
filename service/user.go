@@ -64,9 +64,11 @@ func (u *UserService) Login(username, password, captcha string, captchaID string
 		return nil, errors.New("用户不存在")
 	}
 	if user.Password != encodePassword {
+
 		return nil, errors.New("密码错误")
 	}
-	token, err := jwt.GenerateToken(user.ID, user.Username)
+
+	token, err := jwt.GenerateTokenPair(uint(user.ID), user.Username)
 	if err != nil {
 		return nil, err
 	}
@@ -82,6 +84,23 @@ func (u *UserService) Login(username, password, captcha string, captchaID string
 		RefreshToken: token.RefreshToken,
 		ExpiresIn:    token.ExpiresIn,
 		UserInfo:     userInfo,
+	}, nil
+}
+
+func (u *UserService) GetUserInfo(userId int) (*UserInfo, error) {
+	user, err := u.UserDB.GetUserByID(userId)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, errors.New("用户不存在")
+	}
+	return &UserInfo{
+		ID:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
+		Phone:    user.Phone,
+		Avatar:   user.Avatar,
 	}, nil
 }
 

@@ -40,3 +40,12 @@ func (u *UserDAO) GetUserByUsername(username string) (*model.User, error) {
 	}
 	return user, nil
 }
+
+func (u *UserDAO) GetUserByID(id int) (*model.User, error) {
+	var user *model.User
+	err := u.db.Where("id = ?", id).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
