@@ -115,3 +115,80 @@ func (u *UserController) UserInfo(c *gin.Context) {
 		"data":    user,
 	})
 }
+
+func (u *UserController) UpdateUserInfo(c *gin.Context) {
+	type UpdateUserRequest struct {
+		Username string `json:"username"`
+		Email    string `json:"email"`
+		Phone    string `json:"phone"`
+		Avatar   string `json:"avatar"`
+	}
+	var req UpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    -1,
+			"message": "参数错误",
+			"error":   err,
+		})
+		return
+	}
+	userId, exists := c.Get("admin_user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    -1,
+			"message": "未登录",
+		})
+		return
+	}
+	res, err := u.UserService.UpdateUserInfo(userId.(int), req.Username, req.Email, req.Phone, req.Avatar)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    -1,
+			"message": "更新用户信息失败",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
+		"message": "更新用户信息成功",
+		"data":    res,
+	})
+}
+
+func (u *UserController) ChangePassword(c *gin.Context) {
+	type ChangePasswordRequest struct {
+		OldPassword string `json:"old_password"`
+		NewPassword string `json:"new_password"`
+	}
+	var req ChangePasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    -1,
+			"message": "参数错误",
+			"error":   err,
+		})
+		return
+	}
+	userId, exists := c.Get("admin_user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    -1,
+			"message": "未登录",
+		})
+		return
+	}
+	err := u.UserService.ChangePassword(userId.(int), req.OldPassword, req.NewPassword)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    -1,
+			"message": "修改密码失败",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
+		"message": "修改密码成功",
+	})
+}

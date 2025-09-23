@@ -104,6 +104,45 @@ func (u *UserService) GetUserInfo(userId int) (*UserInfo, error) {
 	}, nil
 }
 
+func (u *UserService) UpdateUserInfo(userId int, username, email, phone, avatar string) (*model.User, error) {
+	user, err := u.UserDB.GetUserByID(userId)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, errors.New("用户不存在")
+	}
+	user.Username = username
+	user.Email = email
+	user.Phone = phone
+	user.Avatar = avatar
+	update_err := u.UserDB.UpdateUser(user)
+	if update_err != nil {
+		return nil, update_err
+	}
+	return u.UserDB.GetUserByID(userId)
+}
+
+func (u *UserService) ChangePassword(userId int, oldPassword, newPassword string) error {
+	user, err := u.UserDB.GetUserByID(userId)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return errors.New("用户不存在")
+	}
+	encodeOldPassword := u.encodePassword(oldPassword)
+	if user.Password != encodeOldPassword {
+		return errors.New("旧密码错误")
+	}
+	if user.Password == u.encodePassword(newPassword) {
+		return errors.New("新密码不能与旧密码相同")
+	}
+	encodeNewPassword := u.encodePassword(newPassword)
+	user.Password = encodeNewPassword
+	return u.UserDB.UpdateUser(user)
+}
+
 func (u *UserService) encodePassword(password string) string {
 	return base64.StdEncoding.EncodeToString([]byte(password))
 }

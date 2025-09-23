@@ -49,3 +49,7 @@ func (u *UserDAO) GetUserByID(id int) (*model.User, error) {
 	}
 	return user, nil
 }
+
+func (u *UserDAO) UpdateUser(user *model.User) error {
+	return u.db.Save(user).Error
+}

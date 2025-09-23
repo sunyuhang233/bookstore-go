@@ -39,6 +39,8 @@ func InitRouter() *gin.Engine {
 	auth.Use(middleware.AdminAuthMiddleware())
 	{
 		auth.GET("/info", userController.UserInfo)
+		auth.POST("/update", userController.UpdateUserInfo)
+		auth.POST("/change_password", userController.ChangePassword)
 	}
 
 	return r
