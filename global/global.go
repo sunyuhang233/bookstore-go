@@ -43,3 +43,17 @@ func InitRedis() {
 	RedisClient = client
 	log.Println("Redis连接成功")
 }
+
+func GetDB() *gorm.DB {
+	return DbClient
+}
+
+func CloseDB() {
+	if DbClient != nil {
+		sqlDB, err := DbClient.DB()
+		if err != nil {
+			log.Println("关闭数据库失败:", err)
+		}
+		sqlDB.Close()
+	}
+}
