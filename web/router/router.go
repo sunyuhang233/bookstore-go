@@ -20,6 +20,7 @@ func InitRouter() *gin.Engine {
 	v1 := r.Group("/api/v1")
 	userController := controller.NewUserController()
 	captchaController := v1.Group("/captcha")
+	bookController := controller.NewBookController()
 	{
 		// 用户相关路由组
 		user := v1.Group("/user")
@@ -41,6 +42,11 @@ func InitRouter() *gin.Engine {
 		auth.GET("/info", userController.UserInfo)
 		auth.POST("/update", userController.UpdateUserInfo)
 		auth.POST("/change_password", userController.ChangePassword)
+	}
+	book := v1.Group("/book")
+	{
+		book.GET("/hot", bookController.GetBooks)
+		book.GET("/new", bookController.GetNewBooks)
 	}
 
 	return r
