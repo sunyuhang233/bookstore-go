@@ -34,3 +34,16 @@ func (b *BookDAO) GetNewBooks(limit int) ([]model.Book, error) {
 	}
 	return books, nil
 }
+
+func (b *BookDAO) GetBooks(page, pageSize int) ([]*model.Book, int, error) {
+	var books []*model.Book
+	var total int64
+	offset := (page - 1) * pageSize
+
+	err := b.db.Where("status = ?", 1).Offset(offset).Limit(pageSize).Find(&books).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	b.db.Model(&model.Book{}).Where("status = ?", 1).Count(&total)
+	return books, int(total), nil
+}

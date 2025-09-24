@@ -17,7 +17,7 @@ func NewBookController() *BookController {
 	}
 }
 
-func (b *BookController) GetBooks(c *gin.Context) {
+func (b *BookController) GetHotBooks(c *gin.Context) {
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 	hotBooks, err := b.BookService.GetHotBooks(limit)
 	if err != nil {
@@ -50,5 +50,27 @@ func (b *BookController) GetNewBooks(c *gin.Context) {
 		"code":    0,
 		"message": "获取最新书籍成功",
 		"data":    newBooks,
+	})
+}
+
+func (b *BookController) GetBooks(c *gin.Context) {
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
+	books, total, err := b.BookService.GetBooks(page, pageSize)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"code":    -1,
+			"message": "获取书籍列表失败",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(200, gin.H{
+		"code":     0,
+		"message":  "获取书籍列表成功",
+		"data":     books,
+		"total":    total,
+		"page":     page,
+		"pageSize": pageSize,
 	})
 }

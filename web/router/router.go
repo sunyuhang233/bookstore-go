@@ -45,8 +45,9 @@ func InitRouter() *gin.Engine {
 	}
 	book := v1.Group("/book")
 	{
-		book.GET("/hot", bookController.GetBooks)
+		book.GET("/hot", bookController.GetHotBooks)
 		book.GET("/new", bookController.GetNewBooks)
+		book.GET("/list", bookController.GetBooks)
 	}
 
 	return r

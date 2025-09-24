@@ -30,3 +30,11 @@ func (s *BookService) GetNewBooks(limit int) ([]model.Book, error) {
 	}
 	return books, nil
 }
+
+func (s *BookService) GetBooks(page, pageSize int) ([]*model.Book, int, error) {
+	books, total, err := s.BookDAO.GetBooks(page, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+	return books, total, nil
+}
