@@ -46,3 +46,11 @@ func (s *BookService) SearchBooks(page int, pageSize int, query string) ([]*mode
 	}
 	return books, total, nil
 }
+
+func (s *BookService) GetBookDetail(id uint) (*model.Book, error) {
+	book, err := s.BookDAO.GetBookByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return book, nil
+}

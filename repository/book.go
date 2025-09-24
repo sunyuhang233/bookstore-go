@@ -65,3 +65,12 @@ func (b *BookDAO) SearchBooks(page int, pageSize int, query string) ([]*model.Bo
 	}
 	return books, int(total), nil
 }
+
+func (b *BookDAO) GetBookByID(id uint) (*model.Book, error) {
+	var book model.Book
+	err := b.db.Where("id = ? AND status = ?", id, 1).First(&book).Error
+	if err != nil {
+		return nil, err
+	}
+	return &book, nil
+}
