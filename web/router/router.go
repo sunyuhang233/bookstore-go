@@ -21,6 +21,7 @@ func InitRouter() *gin.Engine {
 	userController := controller.NewUserController()
 	captchaController := v1.Group("/captcha")
 	bookController := controller.NewBookController()
+	favoriteController := controller.NewFavoriteController()
 	{
 		// 用户相关路由组
 		user := v1.Group("/user")
@@ -50,6 +51,14 @@ func InitRouter() *gin.Engine {
 		book.GET("/list", bookController.GetBooks)
 		book.GET("/search", bookController.SearchBooks)
 		book.GET("/detail/:id", bookController.GetBookDetail)
+	}
+
+	favorite := v1.Group("/favorite")
+	favorite.Use(middleware.AdminAuthMiddleware())
+	{
+		favorite.POST("/add/:id", favoriteController.AddFavorite)
+		favorite.POST("/remove/:id", favoriteController.RemoveFavorite)
+		favorite.GET("/list", favoriteController.GetFavorites)
 	}
 
 	return r
