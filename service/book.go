@@ -38,3 +38,11 @@ func (s *BookService) GetBooks(page, pageSize int) ([]*model.Book, int, error) {
 	}
 	return books, total, nil
 }
+
+func (s *BookService) SearchBooks(page int, pageSize int, query string) ([]*model.Book, int, error) {
+	books, total, err := s.BookDAO.SearchBooks(page, pageSize, query)
+	if err != nil {
+		return nil, 0, err
+	}
+	return books, total, nil
+}

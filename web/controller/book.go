@@ -74,3 +74,33 @@ func (b *BookController) GetBooks(c *gin.Context) {
 		"pageSize": pageSize,
 	})
 }
+
+func (b *BookController) SearchBooks(c *gin.Context) {
+	query := c.Query("q")
+	if query == "" {
+		c.JSON(400, gin.H{
+			"code":    -1,
+			"message": "参数错误",
+		})
+		return
+	}
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
+	books, total, err := b.BookService.SearchBooks(page, pageSize, query)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"code":    -1,
+			"message": "获取书籍列表失败",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(200, gin.H{
+		"code":     0,
+		"message":  "获取书籍列表成功",
+		"data":     books,
+		"total":    total,
+		"page":     page,
+		"pageSize": pageSize,
+	})
+}
